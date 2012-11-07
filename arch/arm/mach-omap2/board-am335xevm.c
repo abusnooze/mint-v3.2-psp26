@@ -2484,6 +2484,32 @@ static struct spi_board_info bone_spidev2_info[] = {
 	},
 };
 
+
+static struct spi_board_info bone_spi1_info[] = { //CS: added this struct
+	{
+		.modalias = "ad193x",
+		.max_speed_hz = 312500, //test: set it 10 times slower... 
+			//3125000 //not sure about this value (48000000 used by communist-code)
+		.bus_num = 2,
+		.chip_select = 0,
+		.mode = SPI_MODE_0, //clock should start low -> CPOL = 0, 
+			//data should be sampled on leading edge -> CPHA = 0 ==> spi mode 0
+	},
+};
+
+static struct spi_board_info bone_spi1_cs1_info[] = { //CS: added this struct for gain control
+	{
+		.modalias = "that5173",
+		.max_speed_hz = 312500, //test: set it 10 times slower... 
+			//3125000 //not sure about this value (48000000 used by communist-code)
+		.bus_num = 2,
+		.chip_select = 1,
+		.mode = SPI_MODE_0, //clock should start low -> CPOL = 0, 
+			//data should be sampled on leading edge -> CPHA = 0 ==> spi mode 0
+	},
+};
+
+
 static struct gpmc_timings am335x_nand_timings = {
 	.sync_clk = 0,
 
