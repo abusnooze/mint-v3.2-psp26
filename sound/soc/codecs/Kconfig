@@ -8,6 +8,11 @@ config SND_SOC_I2C_AND_SPI
 	default y if I2C=y
 	default y if SPI_MASTER=y
 
+#CS: added this option for testing---------
+config SND_SOC_AD193X
+	tristate "Build AD193X codec driver"
+#------------------------------------------
+
 config SND_SOC_ALL_CODECS
 	tristate "Build all ASoC CODEC drivers"
 	select SND_SOC_88PM860X if MFD_88PM860X
@@ -419,3 +424,8 @@ config SND_SOC_WM2000
 
 config SND_SOC_WM9090
 	tristate
+
+#CS: added this ---------
+config SND_SOC_THAT5173
+	tristate "Build THAT5173 gain control driver"
+#------------------------------------------
