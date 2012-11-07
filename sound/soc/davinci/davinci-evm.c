@@ -29,8 +29,32 @@
 #include "davinci-i2s.h"
 #include "davinci-mcasp.h"
 
+#include "../codecs/ad193x.h"
+
+
+/*
 #define AUDIO_FORMAT (SND_SOC_DAIFMT_DSP_B | \
 		SND_SOC_DAIFMT_CBM_CFM | SND_SOC_DAIFMT_IB_NF)
+*/
+
+/*
+#define AUDIO_FORMAT (SND_SOC_DAIFMT_DSP_A | \
+		SND_SOC_DAIFMT_IB_IF | SND_SOC_DAIFMT_CBM_CFM)
+*/
+
+/*
+#define AUDIO_FORMAT (SND_SOC_DAIFMT_I2S | \
+		SND_SOC_DAIFMT_NB_IF | SND_SOC_DAIFMT_CBM_CFM)
+*/
+
+/*
+#define AUDIO_FORMAT (SND_SOC_DAIFMT_I2S | \
+		SND_SOC_DAIFMT_NB_IF | SND_SOC_DAIFMT_CBS_CFS)
+*/
+
+#define AUDIO_FORMAT (SND_SOC_DAIFMT_I2S | \
+		SND_SOC_DAIFMT_NB_IF | SND_SOC_DAIFMT_CBM_CFM)
+
 static int evm_hw_params(struct snd_pcm_substream *substream,
 			 struct snd_pcm_hw_params *params)
 {
@@ -39,6 +63,8 @@ static int evm_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	int ret = 0;
 	unsigned sysclk;
+
+	printk(KERN_DEBUG "Entering davinci-evm.c->evm_hw_params..."); //CS	
 
 	/* ASP1 on DM355 EVM is clocked by an external oscillator */
 	if (machine_is_davinci_dm355_evm() || machine_is_davinci_dm6467_evm() ||
@@ -56,27 +82,44 @@ static int evm_hw_params(struct snd_pcm_substream *substream,
 				machine_is_davinci_da850_evm())
 		sysclk = 24576000;
 	/* On AM335X, CODEC gets MCLK from external Xtal (12MHz). */
-	else if (machine_is_am335xevm())
-		sysclk = 12000000;
+	else if (machine_is_am335xevm()){
+		//sysclk = 12000000;
+		sysclk = 12288000; //CS: master clock on ad193x/ad1974 is 12.288 MHz
+		printk(KERN_DEBUG "davinci-evm.c -> evm_hw_params: machine is am335xevm -> sysclk=12.288 MHz"); //CS
 
-	else
+	}else
 		return -EINVAL;
 
-	/* set codec DAI configuration */
-	ret = snd_soc_dai_set_fmt(codec_dai, AUDIO_FORMAT);
-	if (ret < 0)
-		return ret;
+	///* set codec DAI configuration */ //CS change order for debugging
+	//ret = snd_soc_dai_set_fmt(codec_dai, AUDIO_FORMAT);
+	//if (ret < 0) {
+	//	printk(KERN_DEBUG "davinci-evm.c -> evm_hw_params: snd_soc_dai_set_fmt(...) returned with error: "); //CS
+	//	return ret;
+	//}
 
 	/* set cpu DAI configuration */
 	ret = snd_soc_dai_set_fmt(cpu_dai, AUDIO_FORMAT);
-	if (ret < 0)
+	if (ret < 0) {
+		printk(KERN_DEBUG "davinci-evm.c -> evm_hw_params: snd_soc_dai_set_fmt(cpu_dai) returned with error"); //CS
 		return ret;
+	} else {
+		printk(KERN_DEBUG "davinci-evm.c -> evm_hw_params: snd_soc_dai_set_fmt(cpu_dai) successful"); //CS
+	}
+
+	/* set codec DAI configuration */ //CS: insterted here for debugging
+	//ret = snd_soc_dai_set_fmt(codec_dai, AUDIO_FORMAT);
+	ret = snd_soc_dai_set_fmt(codec_dai, AUDIO_FORMAT);
+	if (ret < 0) {
+		printk(KERN_DEBUG "davinci-evm.c -> evm_hw_params: snd_soc_dai_set_fmt(codec_dai) returned with error: %d\n",ret); //CS
+		return ret;
+	}
 
 	/* set the codec system clock */
 	ret = snd_soc_dai_set_sysclk(codec_dai, 0, sysclk, SND_SOC_CLOCK_OUT);
-	if (ret < 0)
+	if (ret < 0) {
+		printk(KERN_DEBUG "davinci-evm.c -> evm_hw_params: snd_soc_dai_set_sysclk(codec_dai) returned with error"); //CS
 		return ret;
-
+	}
 	return 0;
 }
 
@@ -241,16 +284,47 @@ static struct snd_soc_dai_link da850_evm_dai = {
 	.ops = &evm_ops,
 };
 
+/* //CS: commented this struct
 static struct snd_soc_dai_link am335x_evm_dai = {
 	.name = "TLV320AIC3X",
 	.stream_name = "AIC3X",
-	.cpu_dai_name = "davinci-mcasp.0",
+	.cpu_dai_name = "davinci-mcasp.1",
 	.codec_dai_name = "tlv320aic3x-hifi",
-	.codec_name = "tlv320aic3x-codec.3-001b",
+	.codec_name = "tlv320aic3x-codec.2-001b",
 	.platform_name = "davinci-pcm-audio",
 	.init = evm_aic3x_init,
 	.ops = &evm_ops,
+};*/
+
+static struct snd_soc_dai_link am335x_evm_dai = { //CS: used this struct instead
+	.name = "ad193x",
+	.stream_name = "AD193X",
+	.cpu_dai_name = "davinci-mcasp.0", //.0 instead of .1 (beaglebone uses mcasp.0)
+	.codec_dai_name = "ad193x-hifi",
+	.codec_name = "spi2.0", //CS: make it SPI rather than I2C (spi bus 1 chipselect 0) //CS: now changed to spi2
+	.platform_name = "davinci-pcm-audio",
+	//.init = evm_aic3x_init, //CS: removed this init function
+	.ops = &evm_ops,
 };
+
+
+// CS: added struct (from sound/soc/samsung/neo1973_wm8753.c)
+static struct snd_soc_aux_dev am335x_aux_devs[] = {
+	{
+		.name = "that5173",
+		.codec_name = "spi2.1", //CS: use chipselect 1 on the same spi bus
+		//.init = am335x_that5173_init, //CS: do I need an init function?
+	},
+};
+
+// CS: added struct (from sound/soc/samsung/neo1973_wm8753.c)
+static struct snd_soc_codec_conf am335x_codec_conf[] = {
+	{
+		.dev_name = "spi2.1",
+		.name_prefix = "Amp",
+	},
+};
+
 
 /* davinci dm6446 evm audio machine driver */
 static struct snd_soc_card dm6446_snd_soc_card_evm = {
@@ -296,7 +370,13 @@ static struct snd_soc_card am335x_snd_soc_card = {
 	.name = "AM335X EVM",
 	.dai_link = &am335x_evm_dai,
 	.num_links = 1,
+	.aux_dev = am335x_aux_devs, //CS: from sound/soc/samsung/neo1973_wm8753.c
+	.num_aux_devs = ARRAY_SIZE(am335x_aux_devs), //CS
+	.codec_conf = am335x_codec_conf, //CS
+	.num_configs = ARRAY_SIZE(am335x_codec_conf), //CS
 };
+
+
 
 static struct platform_device *evm_snd_device;
 
@@ -305,6 +385,9 @@ static int __init evm_init(void)
 	struct snd_soc_card *evm_snd_dev_data;
 	int index;
 	int ret;
+
+	printk(KERN_INFO "Entered evm_init in davinci-evm.c. Checking machine..."); //CS
+
 
 	if (machine_is_davinci_evm()) {
 		evm_snd_dev_data = &dm6446_snd_soc_card_evm;
@@ -324,16 +407,20 @@ static int __init evm_init(void)
 	} else if (machine_is_davinci_da850_evm()) {
 		evm_snd_dev_data = &da850_snd_soc_card;
 		index = 0;
+	} else if (machine_is_am335xiaevm()) { //JJH //CS just copied it from 6_virginMcASP, but not need it I guess
+		printk(KERN_INFO "Detected machine: !!!!NEW, BEWARE!!! am335iaxevm -> evm_snd_dev_data = &am335x_snd_soc_card"); //CS
+		evm_snd_dev_data = &am335x_snd_soc_card;
+		index = 0;
 	} else if (machine_is_am335xevm()) {
 		evm_snd_dev_data = &am335x_snd_soc_card;
 		index = 0;
+		printk(KERN_INFO "Detected machine: am335xevm -> evm_snd_dev_data = &am335x_snd_soc_card"); //CS
 	} else
 		return -EINVAL;
 
-	evm_snd_device = platform_device_alloc("soc-audio", index);
-	if (!evm_snd_device) {
+	evm_snd_device = platform_device_alloc("soc-audio", index); //soc-audio: see soc-core.c
+	if (!evm_snd_device)
 		return -ENOMEM;
-	}
 
 	platform_set_drvdata(evm_snd_device, evm_snd_dev_data);
 	ret = platform_device_add(evm_snd_device);
