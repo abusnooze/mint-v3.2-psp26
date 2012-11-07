@@ -218,6 +218,7 @@ int __init am335x_register_mcasp(struct snd_platform_data *pdata, int ctrl_nr)
 			dev_name, oh->name);
 	return IS_ERR(pdev) ? PTR_ERR(pdev) : 0;
 }
+
 #else
 int __init am335x_register_mcasp(struct snd_platform_data *pdata, int ctrl_nr)
 {
@@ -225,7 +226,63 @@ int __init am335x_register_mcasp(struct snd_platform_data *pdata, int ctrl_nr)
 }
 #endif
 
-#if (defined(CONFIG_SND_AM33XX_SOC) || (defined(CONFIG_SND_AM33XX_SOC_MODULE)))
+//CS: added struct according to JJH
+//JJH
+static struct resource am335x_mcasp0_resource[] = {
+	{
+		.name = "mcasp0",
+		.start = AM33XX_ASP0_BASE,
+		.end = AM33XX_ASP0_BASE + (SZ_1K * 12) - 1,
+		.flags = IORESOURCE_MEM,
+	},
+	/* TX event */
+	{
+		.start = AM33XX_DMA_MCASP0_X,
+		.end = AM33XX_DMA_MCASP0_X,
+		.flags = IORESOURCE_DMA,
+	},
+	/* RX event */
+	{
+		.start = AM33XX_DMA_MCASP0_R,
+		.end = AM33XX_DMA_MCASP0_R,
+		.flags = IORESOURCE_DMA,
+	},
+	/* McASP0 Data */
+	{
+		.start  = 0x46400000 ,
+		.end    = 0x46400000 + SZ_4M - 1,
+		.flags  = IORESOURCE_MEM,
+	},
+};
+
+//CS: added struct according to JJH
+//JJH
+static struct platform_device am335x_mcasp0_device = {
+	.name = "davinci-mcasp",
+	.id = 0,
+	.num_resources = ARRAY_SIZE(am335x_mcasp0_resource),
+	.resource = am335x_mcasp0_resource,
+};
+
+//CS: added struct according to JJH
+//JJH
+void __init am335x_register_mcasp0(struct snd_platform_data *pdata)
+{
+	int ret=0; //CS	
+	pr_info("abu: devices.c->%s: Entry\n", __FUNCTION__); //CS
+	//printk(KERN_DEBUG "abu: Entered devices.c->am335x_register_mcasp0...");	 //CS
+
+	am335x_mcasp0_device.dev.platform_data = pdata;
+
+	printk(KERN_DEBUG "abu: devices.c->am335x_register_mcasp0: calling platform_device_register(&am335x_mcasp0_device)\n");	//CS
+
+	ret = platform_device_register(&am335x_mcasp0_device);
+	pr_info("%s: <-platform_device_register(&am335x_mcasp0_device): ret: %d\n", __FUNCTION__,ret); //CS
+}
+
+//CS: according to JJH
+//JJH #if (defined(CONFIG_SND_AM33XX_SOC) || (defined(CONFIG_SND_AM33XX_SOC_MODULE)))
+//JJH Turn on PCM Audio
 struct platform_device am33xx_pcm_device = {
 	.name		= "davinci-pcm-audio",
 	.id		= -1,
@@ -233,11 +290,16 @@ struct platform_device am33xx_pcm_device = {
 
 static void am33xx_init_pcm(void)
 {
-	printk("cape: pcm register");
-	platform_device_register(&am33xx_pcm_device);
+	int ret=0; //CS
+	printk(KERN_DEBUG "abu: Entered devices.c->am335x_init_pcm..");
+	printk(KERN_DEBUG "abu: devices.c->am33xx_init_pcm: calling platform_device_register(&am33xx_pcm_device)\n");	
+	ret = platform_device_register(&am33xx_pcm_device);
+	pr_info("%s: <-platform_device_register(&am33xx_pcm_device): ret: %d\n", __FUNCTION__,ret); //CS
 }
 
-#else
+//CS: according to JJH
+//JJH #else
+#if 0 //JJH
 static inline void am33xx_init_pcm(void) {}
 #endif
 
@@ -902,6 +964,7 @@ static inline void omap_init_vout(void) {}
 static const s16 am33xx_dma_rsv_chans[][2] = {
 	/* (offset, number) */
 	{0, 2},
+	{8, 2}, //CS: (not sure if this is doing any good!!!) Added McASP channels 8 and 9 [from: http://e2e.ti.com/support/dsp/sitara_arm174_microprocessors/f/791/t/193860.aspx ]
 	{14, 2},
 	{26, 6},
 	{48, 4},
@@ -968,7 +1031,7 @@ static struct event_to_channel_map am33xx_xbar_event_mapping[] = {
 	{27, -1},
 	{28, -1},
 	{29, -1},
-	{30, 20},	/* XDMA_EVENT_INTR2 */
+	{30, -1},
 	{31, -1},
 	{-1, -1}
 };
@@ -1049,6 +1112,8 @@ static int __init am33xx_register_edma(void)
 	struct edma_soc_info *pdata = am33xx_edma_info;
 	char oh_name[8];
 
+	printk(KERN_DEBUG "Entering: devices.c->am33xx_register_edma"); //CS	
+
 	if (!cpu_is_am33xx())
 		return -ENODEV;
 
@@ -1072,6 +1137,8 @@ static int __init am33xx_register_edma(void)
 								NULL, 0, 0);
 
 	WARN(IS_ERR(pdev), "could not build omap_device for edma\n");
+
+	printk(KERN_DEBUG "Exit: devices.c->am33xx_register_edma"); //CS
 
 	return IS_ERR(pdev) ? PTR_ERR(pdev) : 0;
 
@@ -1165,6 +1232,8 @@ static int __init omap2_init_devices(void)
 	 * please keep these calls, and their implementations above,
 	 * in alphabetical order so they're easier to sort through.
 	 */
+	printk(KERN_DEBUG "Entering devices.c->omap2_init_devices"); //CS
+
 	omap_init_audio();
 	omap_init_mcpdm();
 	omap_init_dmic();
@@ -1178,7 +1247,7 @@ static int __init omap2_init_devices(void)
 	omap_init_aes();
 	omap_init_vout();
 	am33xx_register_edma();
-	am33xx_init_pcm();
+	am33xx_init_pcm();  //CS: called here but commented out later according to JJH (!?)
 #if defined (CONFIG_SOC_OMAPAM33XX)
 	am335x_register_pruss_uio(&am335x_pruss_uio_pdata);
 	if (omap3_has_sgx())
