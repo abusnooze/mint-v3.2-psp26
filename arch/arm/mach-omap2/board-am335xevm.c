@@ -3468,9 +3468,13 @@ out2:
 		}
 		if(beaglebone_spi1_free == 1) {
 			beaglebone_spi1_free = 0;
-			pr_info("BeagleBone cape: exporting SPI pins as spidev\n");
+			pr_info("BeagleBone cape: exporting SPI pins for AD193x and THAT5173\n");
 			setup_pin_mux(spi1_pin_mux);
-			spi_register_board_info(bone_spidev2_info, ARRAY_SIZE(bone_spidev2_info));
+			spi_register_board_info(bone_spi1_info,
+					ARRAY_SIZE(bone_spi1_info));
+			spi_register_board_info(bone_spi1_cs1_info,
+					ARRAY_SIZE(bone_spi1_cs1_info));
+
 		}
 		if(beaglebone_w1gpio_free == 1) {
 			pr_info("BeagleBone cape: initializing w1-gpio\n");
@@ -3725,11 +3729,18 @@ static void spi0_init(int evm_id, int profile)
 /* setup spi1 */
 static void spi1_init(int evm_id, int profile)
 {
+	pr_info("Entering spi1_init...\n");
 	setup_pin_mux(spi1_pin_mux);
-	spi_register_board_info(bone_spi1_info,
-			ARRAY_SIZE(bone_spi1_info));
-	spi_register_board_info(bone_spi1_cs1_info,
-			ARRAY_SIZE(bone_spi1_cs1_info));
+
+	spi_register_board_info(am335x_spi1_slave_info,
+			ARRAY_SIZE(am335x_spi1_slave_info));
+		
+	//spi_register_board_info(bone_spi1_info,
+	//		ARRAY_SIZE(bone_spi1_info));
+	
+	//spi_register_board_info(bone_spi1_cs1_info,
+	//		ARRAY_SIZE(bone_spi1_cs1_info));
+	
 	return;
 }
 
@@ -3898,7 +3909,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{spi1_init, 	DEV_ON_BASEBOARD, PROFILE_NONE}, //CS: added line
+	//{spi1_init, 	DEV_ON_BASEBOARD, PROFILE_NONE}, //not done here but in beaglebone_cape_setup (out2:)
 	{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE}, //CS: added line
 	{NULL, 0, 0},
 };
