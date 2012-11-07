@@ -3898,6 +3898,8 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{spi1_init, 	DEV_ON_BASEBOARD, PROFILE_NONE}, //CS: added line
+	{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE}, //CS: added line
 	{NULL, 0, 0},
 };
 
