@@ -898,13 +898,18 @@ static struct pinmux_config mcasp1_pin_mux[] = {
 };
 
 /* Module pin mux for mcasp0 */
+//CS: https://groups.google.com/forum/#!msg/beagleboard/9MewKu48jJM/mS6h5vldlj8J
 static struct pinmux_config mcasp0_pin_mux[] = {
-	{"mcasp0_aclkx.mcasp0_aclkx", OMAP_MUX_MODE0 |AM33XX_PIN_INPUT_PULLDOWN},
-	{"mcasp0_fsx.mcasp0_fsx", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
-	{"mcasp0_ahclkr.mcasp0_axr2", OMAP_MUX_MODE2 | AM33XX_PIN_INPUT_PULLDOWN},
-	{"mcasp0_ahclkx.mcasp0_axr3", OMAP_MUX_MODE2 | AM33XX_PIN_INPUT_PULLDOWN},
-	{NULL, 0},
-};
+	 {"lcd_data8.mcasp0_aclkx", OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT_PULLUP}, //CS: try: set as output
+	 {"lcd_data9.mcasp0_fsx", OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT_PULLUP}, //CS: try: set as output
+	 {"lcd_data11.mcasp0_ahclkr", OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, //CS NEW!
+         {"lcd_data12.mcasp0_axr2", OMAP_MUX_MODE4 | AM33XX_PIN_INPUT_PULLDOWN},
+         {"lcd_data13.mcasp0_axr3", OMAP_MUX_MODE4 | AM33XX_PIN_INPUT_PULLDOWN}, 
+	 {"lcd_data15.mcasp0_ahclkx", OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, //CS NEW!
+	 {"gpmc_ben1.mcasp0_aclkr", OMAP_MUX_MODE6 | AM33XX_PIN_INPUT_PULLDOWN}, //CS: try input again (I want bb to be mcasp slave)
+	 {"mcasp0_fsr.mcasp0_fsr", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN}, //CS: try input again (I want bb to be mcasp slave)
+         {NULL, 0},
+}; 
 
 /* Module pin mux for mmc0 */
 static struct pinmux_config mmc0_pin_mux[] = {
