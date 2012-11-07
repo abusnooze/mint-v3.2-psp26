@@ -3726,8 +3726,10 @@ static void spi0_init(int evm_id, int profile)
 static void spi1_init(int evm_id, int profile)
 {
 	setup_pin_mux(spi1_pin_mux);
-	spi_register_board_info(am335x_spi1_slave_info,
-			ARRAY_SIZE(am335x_spi1_slave_info));
+	spi_register_board_info(bone_spi1_info,
+			ARRAY_SIZE(bone_spi1_info));
+	spi_register_board_info(bone_spi1_cs1_info,
+			ARRAY_SIZE(bone_spi1_cs1_info));
 	return;
 }
 
