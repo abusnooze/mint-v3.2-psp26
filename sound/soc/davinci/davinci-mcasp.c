@@ -855,6 +855,8 @@ static int davinci_mcasp_hw_params(struct snd_pcm_substream *substream,
 		word_length = DAVINCI_AUDIO_WORD_16;
 		break;
 
+	case SNDRV_PCM_FORMAT_U24_LE:
+	case SNDRV_PCM_FORMAT_S24_LE:
 	case SNDRV_PCM_FORMAT_U32_LE:
 	case SNDRV_PCM_FORMAT_S32_LE:
 		printk(KERN_DEBUG "davinci-mcasp.c->davinci_mcasp_hw_params: U32/S32 -> dma_params->data_type = 4, word_length = DAVINCI_AUDIO_WORD_32"); //CS
@@ -951,6 +953,8 @@ static struct snd_soc_dai_ops davinci_mcasp_dai_ops = {
 				SNDRV_PCM_FMTBIT_U8 | \
 				SNDRV_PCM_FMTBIT_S16_LE | \
 				SNDRV_PCM_FMTBIT_U16_LE | \
+				SNDRV_PCM_FMTBIT_S24_LE | \
+				SNDRV_PCM_FMTBIT_U24_LE | \
 				SNDRV_PCM_FMTBIT_S32_LE | \
 				SNDRV_PCM_FMTBIT_U32_LE)
 
@@ -1252,6 +1256,10 @@ static int davinci_mcasp_probe(struct platform_device *pdev)
 	printk("Exit davinci-mcasp.c->davinci_mcasp_probe: plat dev: 0x%08X: ret: 0\n", (u32) pdev); //JJH
 	//printk("%s: Exit: plat dev: 0x%08X: ret: 0\n",
 	//      __FUNCTION__, (u32) pdev); //JJH
+
+	
+	//TEST:
+	printk(KERN_ERR "davinci-mcasp->probe: formats = %llx\n", davinci_mcasp_dai[pdata->op_mode].capture.formats); //CS
 
 	return 0;
 

@@ -16,6 +16,8 @@
  *
  */
 
+#define DEBUG
+
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/delay.h>
@@ -76,6 +78,8 @@ static int soc_pcm_open(struct snd_pcm_substream *substream)
 	struct snd_soc_dai_driver *cpu_dai_drv = cpu_dai->driver;
 	struct snd_soc_dai_driver *codec_dai_drv = codec_dai->driver;
 	int ret = 0;
+
+	printk(KERN_ERR "soc-pcm.c: Entered soc_pcm_open...\n"); //CS
 
 	mutex_lock_nested(&rtd->pcm_mutex, rtd->pcm_subclass);
 
@@ -139,6 +143,10 @@ static int soc_pcm_open(struct snd_pcm_substream *substream)
 			   & (SNDRV_PCM_RATE_KNOT | SNDRV_PCM_RATE_CONTINUOUS))
 			runtime->hw.rates |= codec_dai_drv->playback.rates;
 	} else {
+		printk(KERN_ERR "soc-pcm.c->soc_pcm_open: substream->stream != PLAYBACK\n"); //CS
+		printk(KERN_ERR "soc-pcm.c->soc_pcm_open: codec_dai_drv->catpure.formats = %llx\n", codec_dai_drv->capture.formats); //CS
+		printk(KERN_ERR "soc-pcm.c->soc_pcm_open: cpu_dai_drv->catpure.formats = %llx\n", cpu_dai_drv->capture.formats); //CS
+
 		runtime->hw.rate_min =
 			max(codec_dai_drv->capture.rate_min,
 			    cpu_dai_drv->capture.rate_min);
