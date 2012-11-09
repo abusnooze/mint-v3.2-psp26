@@ -306,7 +306,8 @@ static int ad193x_set_dai_fmt(struct snd_soc_dai *codec_dai,
 		break;
 	case SND_SOC_DAIFMT_NB_IF: /* normal bclk + invert frm */
 		printk(KERN_DEBUG "normal bit clock + invert frame\n"); //CS
-		adc_reg2 |= AD193X_ADC_LEFT_HIGH;  
+		//adc_reg2 |= AD193X_ADC_LEFT_HIGH; 
+		adc_reg2 &= ~AD193X_ADC_LEFT_HIGH; //CS: this is wrong here but lets see if communication with McASP changes 
 		adc_reg2 &= ~AD193X_ADC_BCLK_INV;
 		//dac_reg |= AD193X_DAC_LEFT_HIGH;
 		//dac_reg &= ~AD193X_DAC_BCLK_INV;
