@@ -2474,16 +2474,16 @@ static struct spi_board_info am335x_spi1_slave_info[] = {
 	},
 };
 
-static struct spi_board_info bone_spidev2_info[] = {
+
+static struct spi_board_info bone_spidev1_info[] = {
 	{
 		.modalias      = "spidev",
 		.irq           = -1,
-		.max_speed_hz  = 12000000,
-		.bus_num       = 2,
+		.max_speed_hz  = 312500,
+		.bus_num       = 1,
 		.chip_select   = 0,
 	},
 };
-
 
 static struct spi_board_info bone_spi1_info[] = { //CS: added this struct
 	{
@@ -3474,6 +3474,10 @@ out2:
 					ARRAY_SIZE(bone_spi1_info));
 			spi_register_board_info(bone_spi1_cs1_info,
 					ARRAY_SIZE(bone_spi1_cs1_info));
+	
+			setup_pin_mux(spi0_pin_mux);			
+			spi_register_board_info(bone_spidev1_info, 
+					ARRAY_SIZE(bone_spidev1_info));
 
 		}
 		if(beaglebone_w1gpio_free == 1) {
