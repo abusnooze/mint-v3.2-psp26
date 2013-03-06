@@ -71,8 +71,10 @@ static const struct snd_kcontrol_new ad193x_snd_controls[] = {
 	*/
 
 	/* ADC high-pass filter */
+	/*CS
 	SOC_SINGLE("ADC High Pass Filter Switch", AD193X_ADC_CTRL0,
 			AD193X_ADC_HIGHPASS_FILTER, 1, 0),
+	*/
 
 	/* DAC de-emphasis */
 	//SOC_ENUM("Playback Deemphasis", ad193x_deemp_enum), //CS
@@ -585,9 +587,9 @@ static int ad193x_probe(struct snd_soc_codec *codec)
 		     Word width: 24 [00]
 		     Reserve [xxx]
 		     ==> 0x00*/
-	snd_soc_write(codec, AD193X_ADC_CTRL0, 0x00);
+	snd_soc_write(codec, AD193X_ADC_CTRL0, 0x02);
 		/*   Power-down: normal [0]
-		     High-pass filter: Off [0]
+		     High-pass filter: On [1]
 		     ADC1L/1R/2L/2R mute: Unmute all [0000]
 		     Output sample rate: 32/44.1/48 kHz [00]
 		     ==> 0x00*/	
