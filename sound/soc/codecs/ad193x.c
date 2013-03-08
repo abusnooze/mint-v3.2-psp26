@@ -553,13 +553,13 @@ static int ad193x_probe(struct snd_soc_codec *codec)
 	/*---------------------------------------------*/
 
 	/*Writing default values to registers---------*/
-	snd_soc_write(codec, AD193X_PLL_CLK_CTRL0, 0xd8);
+	snd_soc_write(codec, AD193X_PLL_CLK_CTRL0, 0x98);
 		/*   PLL power-down: normal operation [0 (LSB)]
 		     MCKLI/XI pin functionality (PLL active): INPUT 256 (x44.1 or 48 kHz) [00]
 		   ? MCKLO/XO pin: off (?) [11]
-		     PLL input: ALRCLK [10]
+		     PLL input: MCLKI/XI [00]
 		     Internal MCLK enable: Enable->ADC active [1] 
-		     ==> 0xd8*/
+		     ==> 0x98*/
 	snd_soc_write(codec, AD193X_PLL_CLK_CTRL1, 0x04);
 		/*   AUXPORT clock source select: PLL clock [0]
 		     ADC clock source select: PLL clock [0]
@@ -599,11 +599,11 @@ static int ad193x_probe(struct snd_soc_codec *codec)
 		     Serial format: ADC AUX mode (TDM-coupled) [10]
 		     BCLK active edge (TDM_IN): Latch in midcycle (normal) [0]
 		     ==> 0x40*/
-	snd_soc_write(codec, AD193X_ADC_CTRL2, 0xe4);
+	snd_soc_write(codec, AD193X_ADC_CTRL2, 0xec);
 		/*   LRCLK format: 50/50 [0]
 		     BCLK polarity: Drive out on falling edge (DEF) [0]
 		     LRCLK polarity: Left high [1]
-		     LRCLK master/slave: slave [0]
+		     LRCLK master/slave: master [1]
 		     BCLKs per frame: 256 [10] 
 		     BCLK master/slave: master [1]
 		     BCLK source: internally generated [1] 
