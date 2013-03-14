@@ -30,11 +30,11 @@
 
 
 
-#define VINCIPRINTK  //give loads debug info
-#define DEBUG  //give me debug info
+//#define VINCIPRINTK  //give loads debug info
+//#define DEBUG  //give me debug info
 
 
-//#ifdef DEBUG
+#ifdef DEBUG
 static void print_buf_info(int slot, char *name)
 {
 	struct edmacc_param p;
@@ -46,11 +46,11 @@ static void print_buf_info(int slot, char *name)
 	printk(KERN_DEBUG "    src_dst_bidx=%x link_bcntrld=%x src_dst_cidx=%x ccnt=%x\n",
 			p.src_dst_bidx, p.link_bcntrld, p.src_dst_cidx, p.ccnt);
 }
-//#else
-//static void print_buf_info(int slot, char *name)
-//{
-//}
-//#endif
+#else
+static void print_buf_info(int slot, char *name)
+{
+}
+#endif
 
 #define DAVINCI_PCM_FMTBITS	(\
 				SNDRV_PCM_FMTBIT_S8	|\
@@ -276,7 +276,7 @@ static void davinci_pcm_dma_irq(unsigned link, u16 ch_status, void *data)
 	
 
 	if (unlikely(ch_status != DMA_COMPLETE)) {
-		printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: DMA_COMPLETE, return\n"); //CS 
+		//printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: DMA_COMPLETE, return\n"); //CS 
 		return;
 	}
 
@@ -284,7 +284,7 @@ static void davinci_pcm_dma_irq(unsigned link, u16 ch_status, void *data)
 		spin_lock(&prtd->lock);
 		if (prtd->ram_channel < 0) {
 			/* No ping/pong must fix up link dma data*/
-			printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: No ping/pong must fix up link dma data -> davinci_pcm_enqueue_dma\n"); //CS 
+			//printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: No ping/pong must fix up link dma data -> davinci_pcm_enqueue_dma\n"); //CS 
 			davinci_pcm_enqueue_dma(substream);
 		}
 		davinci_pcm_period_elapsed(substream);
