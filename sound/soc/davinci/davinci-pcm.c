@@ -28,9 +28,13 @@
 
 #include "davinci-pcm.h"
 
- //#define VINCIPRINTK	1 //only define if you want loads of msgs
 
-#ifdef DEBUG
+
+#define VINCIPRINTK  //give loads debug info
+#define DEBUG  //give me debug info
+
+
+//#ifdef DEBUG
 static void print_buf_info(int slot, char *name)
 {
 	struct edmacc_param p;
@@ -42,11 +46,11 @@ static void print_buf_info(int slot, char *name)
 	printk(KERN_DEBUG "    src_dst_bidx=%x link_bcntrld=%x src_dst_cidx=%x ccnt=%x\n",
 			p.src_dst_bidx, p.link_bcntrld, p.src_dst_cidx, p.ccnt);
 }
-#else
-static void print_buf_info(int slot, char *name)
-{
-}
-#endif
+//#else
+//static void print_buf_info(int slot, char *name)
+//{
+//}
+//#endif
 
 #define DAVINCI_PCM_FMTBITS	(\
 				SNDRV_PCM_FMTBIT_S8	|\
@@ -265,18 +269,22 @@ static void davinci_pcm_dma_irq(unsigned link, u16 ch_status, void *data)
 	#ifdef VINCIPRINTK		
 		printk(KERN_DEBUG "Entering davinci-pcm.c->davinci_pcm_dma_irq\n"); //CS 
 		printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: link=%d, status=0x%x\n",link, ch_status); //CS 
+		printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: prtd->ram_channel=%d (0x%x)\n", prtd->ram_channel, prtd->ram_channel); //CS
 	#endif
 	print_buf_info(prtd->ram_channel, "i ram_channel");
 	pr_debug("davinci_pcm: link=%d, status=0x%x\n", link, ch_status);
 	
 
-	if (unlikely(ch_status != DMA_COMPLETE))
+	if (unlikely(ch_status != DMA_COMPLETE)) {
+		printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: DMA_COMPLETE, return\n"); //CS 
 		return;
+	}
 
 	if (snd_pcm_running(substream)) {
 		spin_lock(&prtd->lock);
 		if (prtd->ram_channel < 0) {
 			/* No ping/pong must fix up link dma data*/
+			printk(KERN_DEBUG "davinci-pcm.c->davinci_pcm_dma_irq: No ping/pong must fix up link dma data -> davinci_pcm_enqueue_dma\n"); //CS 
 			davinci_pcm_enqueue_dma(substream);
 		}
 		davinci_pcm_period_elapsed(substream);

@@ -413,9 +413,9 @@ static void davinci_mcasp_start(struct davinci_audio_dev *dev, int stream)
 			printk(KERN_DEBUG "davinci-mcasp.c->mcasp_start: dev->rxnumevt != NULL -> flush and enable FIFO\n"); //CS
 			if (dev->version == MCASP_VERSION_3) {
 				printk(KERN_DEBUG "davinci-mcasp.c->mcasp_start: stream != SNDRV_PCM_STREAM_PLAYBACK and version = MCASP_VERSION3\n"); //CS
-				mcasp_clr_bits(dev->base + MCASP_VER3_WFIFOCTL,
+				mcasp_clr_bits(dev->base + MCASP_VER3_RFIFOCTL,  //CS: there has been an error it seems: it's been WFIFOCTL instead of RFIFOCTL here
 								FIFO_ENABLE);
-				mcasp_set_bits(dev->base + MCASP_VER3_WFIFOCTL,
+				mcasp_set_bits(dev->base + MCASP_VER3_RFIFOCTL,
 								FIFO_ENABLE);
 			} else {
 				printk(KERN_DEBUG "davinci-mcasp.c->mcasp_start: stream != SNDRV_PCM_STREAM_PLAYBACK and version != MCASP_VERSION3\n"); //CS

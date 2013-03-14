@@ -589,12 +589,12 @@ static int ad193x_probe(struct snd_soc_codec *codec)
 		     Serial format: ADC AUX mode (TDM-coupled) [10]
 		     BCLK active edge (TDM_IN): Latch in midcycle (normal) [0]
 		     ==> 0x40*/
-	snd_soc_write(codec, AD193X_ADC_CTRL2, 0xed);
+	snd_soc_write(codec, AD193X_ADC_CTRL2, 0xdd);
 		/*   LRCLK format: Pulse [1]
 		     BCLK polarity: Drive out on falling edge (DEF) [0]
 		     LRCLK polarity: Left high [1]
 		     LRCLK master/slave: master [1]
-		     BCLKs per frame: 256 [10] 
+		     BCLKs per frame: 128 [01] 
 		     BCLK master/slave: master [1]
 		     BCLK source: internally generated [1] 
 		     ==> 0xed*/
