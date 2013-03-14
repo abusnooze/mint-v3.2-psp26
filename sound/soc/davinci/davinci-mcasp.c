@@ -767,8 +767,8 @@ static void davinci_hw_param(struct davinci_audio_dev *dev, int stream)
 		/* DSP_B mode */
 		mcasp_set_bits(dev->base + DAVINCI_MCASP_RXFMT_REG, RXORD); //Bitstream is MSB first
 
-		mcasp_mod_bits(dev->base + DAVINCI_MCASP_RXFMT_REG, //CS: Receive bit-delay of 2 bits (datasheet pg. 4027)
-					FSRDLY(0x01), FSRDLY(0x03)); //changed to 1 bit delay for testing
+		mcasp_mod_bits(dev->base + DAVINCI_MCASP_RXFMT_REG, //CS: Receive bit-delay of 0 bits (datasheet pg. 4027)
+					FSRDLY(0x00), FSRDLY(0x03)); 
 
 		//mcasp_set_bits(dev->base + DAVINCI_MCASP_AHCLKRCTL_REG, AHCLKRE); 
 		mcasp_clr_bits(dev->base + DAVINCI_MCASP_AHCLKRCTL_REG, AHCLKRE); //CS: External receive high-frequency clock source from AHCLKR pin.
