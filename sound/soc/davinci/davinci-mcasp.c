@@ -738,6 +738,7 @@ static void davinci_hw_param(struct davinci_audio_dev *dev, int stream)
 	active_slots = (dev->tdm_slots > 31) ? 32 : dev->tdm_slots;
 	for (i = 0; i < active_slots; i++)
 		mask |= (1 << i);
+        /*change the mask to pad channels 6-8. But: Hard code here or possible from ALSA-lib?*/
 
 	//mcasp_clr_bits(dev->base + DAVINCI_MCASP_ACLKXCTL_REG, TX_ASYNC);
 	mcasp_set_bits(dev->base + DAVINCI_MCASP_ACLKXCTL_REG, TX_ASYNC); //CS: if this bit (ACLKXCTL_REG.ASYNC) is 0, rx and tx clock generators are coupled!
