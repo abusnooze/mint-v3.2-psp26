@@ -735,7 +735,8 @@ static void davinci_hw_param(struct davinci_audio_dev *dev, int stream)
 
 	printk(KERN_DEBUG "Entering davinci-mcasp.c->davinci_hw_param\n"); //CS
 
-	active_slots = (dev->tdm_slots > 31) ? 32 : dev->tdm_slots;
+	//active_slots = (dev->tdm_slots > 31) ? 32 : dev->tdm_slots;
+	active_slots = 5; //temp: try to hardcode 5 channels. Everybody else thinks its 8 channels
 	for (i = 0; i < active_slots; i++)
 		mask |= (1 << i);
         /*change the mask to pad channels 6-8. But: Hard code here or possible from ALSA-lib?*/
