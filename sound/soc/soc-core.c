@@ -746,7 +746,7 @@ static struct snd_soc_dai_ops null_dai_ops = {
 
 static int soc_bind_dai_link(struct snd_soc_card *card, int num)
 {
-	printk(KERN_DEBUG "Entering soc-core.c -> soc_bind_dai_link"); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c -> soc_bind_dai_link"); //CS
 
 	struct snd_soc_dai_link *dai_link = &card->dai_link[num];
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
@@ -948,7 +948,7 @@ static int soc_probe_codec(struct snd_soc_card *card,
 	int ret = 0;
 	const struct snd_soc_codec_driver *driver = codec->driver;
 
-	printk(KERN_DEBUG "Entering: soc-core.c->soc_probe_codec. Waiting for success..."); //CS
+	//printk(KERN_DEBUG "Entering: soc-core.c->soc_probe_codec. Waiting for success..."); //CS
 
 	codec->card = card;
 	codec->dapm.card = card;
@@ -987,7 +987,7 @@ static int soc_probe_codec(struct snd_soc_card *card,
 	list_add(&codec->card_list, &card->codec_dev_list);
 	list_add(&codec->dapm.list, &card->dapm_list);
 
-	printk(KERN_DEBUG "soc-core.c->soc_probe_codec: ...success!"); //CS
+	//printk(KERN_DEBUG "soc-core.c->soc_probe_codec: ...success!"); //CS
 
 	return 0;
 
@@ -1117,7 +1117,7 @@ static int soc_post_component_init(struct snd_soc_card *card,
 
 static int soc_probe_dai_link(struct snd_soc_card *card, int num, int order)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->soc_probe_dai_link..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->soc_probe_dai_link..."); //CS
 	struct snd_soc_dai_link *dai_link = &card->dai_link[num];
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
 	struct snd_soc_codec *codec = rtd->codec;
@@ -1553,7 +1553,7 @@ static int soc_probe(struct platform_device *pdev)
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 	int ret = 0;
 
-	printk(KERN_DEBUG "Entering soc-core.c->soc_probe..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->soc_probe..."); //CS
 
 	/*
 	 * no card, so machine driver should be registering card
@@ -1567,7 +1567,7 @@ static int soc_probe(struct platform_device *pdev)
 	/* Bodge while we unpick instantiation */
 	card->dev = &pdev->dev;
 	
-	printk(KERN_DEBUG "soc-core.c->soc_probe: calling snd_soc_register_card"); //CS
+	//printk(KERN_DEBUG "soc-core.c->soc_probe: calling snd_soc_register_card"); //CS
 	ret = snd_soc_register_card(card);
 	if (ret != 0) {
 		printk(KERN_DEBUG "soc-core.c->soc_probe: Failed to register card"); //CS
@@ -1575,8 +1575,8 @@ static int soc_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "Failed to register card\n");
 		return ret;
 	}
-	printk(KERN_DEBUG "soc-core.c->soc_probe: register card: successful!"); //CS
-	printk(KERN_DEBUG "Exit soc-core.c->soc_probe"); //CS
+	//printk(KERN_DEBUG "soc-core.c->soc_probe: register card: successful!"); //CS
+	//printk(KERN_DEBUG "Exit soc-core.c->soc_probe"); //CS
 	return 0;
 }
 
@@ -1811,7 +1811,7 @@ unsigned int snd_soc_read(struct snd_soc_codec *codec, unsigned int reg)
 	unsigned int ret;
 
 	ret = codec->read(codec, reg);
-	printk (KERN_DEBUG "soc-core.c->snd_soc_read: read 0x%x = 0x%x\n", reg, ret); //CS 
+	//printk (KERN_DEBUG "soc-core.c->snd_soc_read: read 0x%x = 0x%x\n", reg, ret); //CS 
 	dev_dbg(codec->dev, "read %x => %x\n", reg, ret);
 	trace_snd_soc_reg_read(codec, reg, ret);
 
@@ -1823,7 +1823,7 @@ unsigned int snd_soc_write(struct snd_soc_codec *codec,
 			   unsigned int reg, unsigned int val)
 {
 	dev_dbg(codec->dev, "write %x = %x\n", reg, val);
-	printk(KERN_DEBUG "soc-core.c->snd_soc_write: write 0x%x = 0x%x\n", reg, val);
+	//printk(KERN_DEBUG "soc-core.c->snd_soc_write: write 0x%x = 0x%x\n", reg, val);
 	trace_snd_soc_reg_write(codec, reg, val);
 	return codec->write(codec, reg, val);
 }
@@ -1854,10 +1854,10 @@ int snd_soc_update_bits(struct snd_soc_codec *codec, unsigned short reg,
 	unsigned int old, new;
 	int ret;
 	
-	printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: calling snd_soc read register: %x\n", reg); //CS
+	//printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: calling snd_soc read register: %x\n", reg); //CS
 	ret = snd_soc_read(codec, reg);
 	if (ret < 0) {
-		printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: ERROR: failed to snd_soc_read"); //CS
+		printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: ERROR 1: failed to snd_soc_read"); //CS
 		return ret;
 	}
 
@@ -1865,16 +1865,16 @@ int snd_soc_update_bits(struct snd_soc_codec *codec, unsigned short reg,
 	new = (old & ~mask) | (value & mask);
 	change = old != new;
 	if (change) {
-		printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: applied mask %x, writing %x to register: %x\n", mask, new, reg); //CS
-		printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: calling snd_soc_write"); //CS
+		//printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: applied mask %x, writing %x to register: %x\n", mask, new, reg); //CS
+		//printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: calling snd_soc_write"); //CS
 		ret = snd_soc_write(codec, reg, new);
 		if (ret < 0) {
-			printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: ERROR: failed to snd_soc_write"); //CS
+			printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: ERROR 2: failed to snd_soc_write"); //CS
 			return ret;
 		}
 	}
 
-	printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: return without error"); //CS
+	//printk(KERN_DEBUG "soc-core.c->snd_soc_update_bits: return without error"); //CS
 	return change;
 }
 EXPORT_SYMBOL_GPL(snd_soc_update_bits);
@@ -2017,7 +2017,7 @@ int snd_soc_add_controls(struct snd_soc_codec *codec,
 	struct snd_card *card = codec->card->snd_card;
 	int err, i;
 
-	printk(KERN_DEBUG "Enter soc-core.c->snd_soc_add_controls. Add %d new controls\n", num_controls);
+	//printk(KERN_DEBUG "Enter soc-core.c->snd_soc_add_controls. Add %d new controls\n", num_controls);
 
 	for (i = 0; i < num_controls; i++) {
 		const struct snd_kcontrol_new *control = &controls[i];
@@ -2644,13 +2644,13 @@ EXPORT_SYMBOL_GPL(snd_soc_put_volsw_2r_sx);
 int snd_soc_dai_set_sysclk(struct snd_soc_dai *dai, int clk_id,
 	unsigned int freq, int dir)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_sysclk..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_sysclk..."); //CS
 
 	if (dai->driver && dai->driver->ops->set_sysclk) {
-		printk(KERN_DEBUG "returning dai->driver->ops->set_sysclk(dai, clk_id, freq, dir)"); //CS
+		//printk(KERN_DEBUG "returning dai->driver->ops->set_sysclk(dai, clk_id, freq, dir)"); //CS
 		return dai->driver->ops->set_sysclk(dai, clk_id, freq, dir);
 	} else if (dai->codec && dai->codec->driver->set_sysclk) {
-		printk(KERN_DEBUG "returning dai->codec->driver->set_sysclk(dai->codec, clk_id, 0, freq, dir)"); //CS
+		//printk(KERN_DEBUG "returning dai->codec->driver->set_sysclk(dai->codec, clk_id, 0, freq, dir)"); //CS
 		return dai->codec->driver->set_sysclk(dai->codec, clk_id, 0,
 						      freq, dir);
 	} else {
@@ -2673,7 +2673,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_sysclk);
 int snd_soc_codec_set_sysclk(struct snd_soc_codec *codec, int clk_id,
 			     int source, unsigned int freq, int dir)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_codec_set_sysclk..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_codec_set_sysclk..."); //CS
 	if (codec->driver->set_sysclk)
 		return codec->driver->set_sysclk(codec, clk_id, source,
 						 freq, dir);
@@ -2695,7 +2695,7 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_set_sysclk);
 int snd_soc_dai_set_clkdiv(struct snd_soc_dai *dai,
 	int div_id, int div)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_clkdiv..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_clkdiv..."); //CS
 	if (dai->driver && dai->driver->ops->set_clkdiv)
 		return dai->driver->ops->set_clkdiv(dai, div_id, div);
 	else
@@ -2716,7 +2716,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_clkdiv);
 int snd_soc_dai_set_pll(struct snd_soc_dai *dai, int pll_id, int source,
 	unsigned int freq_in, unsigned int freq_out)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_pll..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_pll..."); //CS
 	if (dai->driver && dai->driver->ops->set_pll)
 		return dai->driver->ops->set_pll(dai, pll_id, source,
 					 freq_in, freq_out);
@@ -2741,7 +2741,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_pll);
 int snd_soc_codec_set_pll(struct snd_soc_codec *codec, int pll_id, int source,
 			  unsigned int freq_in, unsigned int freq_out)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_codec_set_pll..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_codec_set_pll..."); //CS
 	if (codec->driver->set_pll)
 		return codec->driver->set_pll(codec, pll_id, source,
 					      freq_in, freq_out);
@@ -2759,10 +2759,10 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_set_pll);
  */
 int snd_soc_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_fmt..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_fmt..."); //CS
 
 	if (dai->driver && dai->driver->ops->set_fmt) {
-		printk(KERN_DEBUG "returning dai->driver->ops->set_fmt(dai, fmt)"); //CS
+		//printk(KERN_DEBUG "returning dai->driver->ops->set_fmt(dai, fmt)"); //CS
 		return dai->driver->ops->set_fmt(dai, fmt);
 	} else {
 		printk(KERN_DEBUG "soc-core.c->snd_soc_dai_set_fmt: ERROR!"); //CS
@@ -2785,9 +2785,9 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_fmt);
 int snd_soc_dai_set_tdm_slot(struct snd_soc_dai *dai,
 	unsigned int tx_mask, unsigned int rx_mask, int slots, int slot_width)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_tdm_slot.."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_tdm_slot.."); //CS
 	if (dai->driver && dai->driver->ops->set_tdm_slot) {
-		printk(KERN_DEBUG "returning dai->driver->ops->set_tdm_slot(dai, tx_mask, rx_mask,slots, slot_width)"); //CS
+		//printk(KERN_DEBUG "returning dai->driver->ops->set_tdm_slot(dai, tx_mask, rx_mask,slots, slot_width)"); //CS
 		return dai->driver->ops->set_tdm_slot(dai, tx_mask, rx_mask,
 				slots, slot_width);
 	} else {
@@ -2813,7 +2813,7 @@ int snd_soc_dai_set_channel_map(struct snd_soc_dai *dai,
 	unsigned int tx_num, unsigned int *tx_slot,
 	unsigned int rx_num, unsigned int *rx_slot)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_channel_map."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_channel_map."); //CS
 	if (dai->driver && dai->driver->ops->set_channel_map)
 		return dai->driver->ops->set_channel_map(dai, tx_num, tx_slot,
 			rx_num, rx_slot);
@@ -2831,7 +2831,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_channel_map);
  */
 int snd_soc_dai_set_tristate(struct snd_soc_dai *dai, int tristate)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_tristate.."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_set_tristate.."); //CS
 	if (dai->driver && dai->driver->ops->set_tristate)
 		return dai->driver->ops->set_tristate(dai, tristate);
 	else
@@ -2848,7 +2848,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_tristate);
  */
 int snd_soc_dai_digital_mute(struct snd_soc_dai *dai, int mute)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_digital_mute.."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_dai_digital_mute.."); //CS
 	if (dai->driver && dai->driver->ops->digital_mute)
 		return dai->driver->ops->digital_mute(dai, mute);
 	else
@@ -2866,8 +2866,8 @@ int snd_soc_register_card(struct snd_soc_card *card)
 {
 	int i;
 
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_card..."); //CS
-	printk(KERN_DEBUG "Registering card..."); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_card..."); //CS
+	//printk(KERN_DEBUG "Registering card..."); //CS
 
 	if (!card->name || !card->dev)
 		return -EINVAL;
@@ -2898,10 +2898,10 @@ int snd_soc_register_card(struct snd_soc_card *card)
 	snd_soc_instantiate_cards();
 	mutex_unlock(&client_mutex);
 
-	printk(KERN_DEBUG "Registered card '%s'\n", card->name); //CS
+	//printk(KERN_DEBUG "Registered card '%s'\n", card->name); //CS
 	dev_dbg(card->dev, "Registered card '%s'\n", card->name);
 
-	printk(KERN_DEBUG "Exit soc-core.c->snd_soc_register_card"); //CS
+	//printk(KERN_DEBUG "Exit soc-core.c->snd_soc_register_card"); //CS
 	return 0;
 }
 EXPORT_SYMBOL_GPL(snd_soc_register_card);
@@ -2992,7 +2992,7 @@ static inline char *fmt_multiple_name(struct device *dev,
 int snd_soc_register_dai(struct device *dev,
 		struct snd_soc_dai_driver *dai_drv)
 {
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_dai..."); //CS	
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_dai..."); //CS	
 	
 	struct snd_soc_dai *dai;
 
@@ -3019,7 +3019,7 @@ int snd_soc_register_dai(struct device *dev,
 	snd_soc_instantiate_cards();
 	mutex_unlock(&client_mutex);
 
-	printk("Registered DAI '%s'\n", dai->name); //CS
+	//printk("Registered DAI '%s'\n", dai->name); //CS
 	pr_debug("Registered DAI '%s'\n", dai->name);
 
 	return 0;
@@ -3064,8 +3064,8 @@ int snd_soc_register_dais(struct device *dev,
 	struct snd_soc_dai *dai;
 	int i, ret = 0;
 
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_dais...\n"); //CS
-	printk(KERN_DEBUG "dai to register %s #%Zu\n", dev_name(dev), count); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_dais...\n"); //CS
+	//printk(KERN_DEBUG "dai to register %s #%Zu\n", dev_name(dev), count); //CS
 	dev_dbg(dev, "dai register %s #%Zu\n", dev_name(dev), count);
 
 	for (i = 0; i < count; i++) {
@@ -3097,7 +3097,7 @@ int snd_soc_register_dais(struct device *dev,
 		list_add(&dai->list, &dai_list);
 		mutex_unlock(&client_mutex);
 
-		printk(KERN_DEBUG "Registered DAI '%s'\n", dai->name); //CS
+		//printk(KERN_DEBUG "Registered DAI '%s'\n", dai->name); //CS
 		pr_debug("Registered DAI '%s'\n", dai->name);
 	}
 
@@ -3105,7 +3105,7 @@ int snd_soc_register_dais(struct device *dev,
 	snd_soc_instantiate_cards();
 	mutex_unlock(&client_mutex);
 
-	printk(KERN_DEBUG "Exit: soc-core.c->snd_soc_register_dais\n"); //CS
+	//printk(KERN_DEBUG "Exit: soc-core.c->snd_soc_register_dais\n"); //CS
 	return 0;
 
 err:
@@ -3140,8 +3140,8 @@ EXPORT_SYMBOL_GPL(snd_soc_unregister_dais);
 int snd_soc_register_platform(struct device *dev,
 		struct snd_soc_platform_driver *platform_drv)
 {
-	printk(KERN_DEBUG "Entering: soc_core.c->snd_soc_register_platform..."); //CS
-	printk(KERN_DEBUG "platform to register: %s\n", dev_name(dev)); //CS	
+	//printk(KERN_DEBUG "Entering: soc_core.c->snd_soc_register_platform..."); //CS
+	//printk(KERN_DEBUG "platform to register: %s\n", dev_name(dev)); //CS	
 
 	struct snd_soc_platform *platform;
 
@@ -3169,10 +3169,10 @@ int snd_soc_register_platform(struct device *dev,
 	snd_soc_instantiate_cards();
 	mutex_unlock(&client_mutex);
 
-	printk(KERN_DEBUG "Registered platform '%s'\n", platform->name); //CS
+	//printk(KERN_DEBUG "Registered platform '%s'\n", platform->name); //CS
 	pr_debug("Registered platform '%s'\n", platform->name);
 	
-	printk(KERN_DEBUG "Exit: soc_core.c->snd_soc_register_platform"); //CS
+	//printk(KERN_DEBUG "Exit: soc_core.c->snd_soc_register_platform"); //CS
 
 	return 0;
 }
@@ -3252,8 +3252,8 @@ int snd_soc_register_codec(struct device *dev,
 	struct snd_soc_codec *codec;
 	int ret, i;
 
-	printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_codec...\n"); //CS
-	printk(KERN_DEBUG "...codec to register: %s\n", dev_name(dev)); //CS
+	//printk(KERN_DEBUG "Entering soc-core.c->snd_soc_register_codec...\n"); //CS
+	//printk(KERN_DEBUG "...codec to register: %s\n", dev_name(dev)); //CS
 	dev_dbg(dev, "codec register %s\n", dev_name(dev));
 
 	codec = kzalloc(sizeof(struct snd_soc_codec), GFP_KERNEL);
@@ -3323,7 +3323,7 @@ int snd_soc_register_codec(struct device *dev,
 
 	/* register any DAIs */
 	if (num_dai) {
-		printk(KERN_DEBUG "soc-core.c->snd_soc_register_codec: calling snd_soc_register_dais");
+		//printk(KERN_DEBUG "soc-core.c->snd_soc_register_codec: calling snd_soc_register_dais");
 		ret = snd_soc_register_dais(dev, dai_drv, num_dai);
 		if (ret < 0)
 			goto fail;
@@ -3336,7 +3336,7 @@ int snd_soc_register_codec(struct device *dev,
 
 	printk(KERN_DEBUG "registered codec: '%s'\n", codec->name); //CS
 	pr_debug("Registered codec '%s'\n", codec->name);
-	printk(KERN_DEBUG "Exit: soc-core.c->snd_soc_register_codec...\n"); //CS
+	//printk(KERN_DEBUG "Exit: soc-core.c->snd_soc_register_codec...\n"); //CS
 	return 0;
 
 fail:
@@ -3386,11 +3386,11 @@ EXPORT_SYMBOL_GPL(snd_soc_unregister_codec);
 static int __init snd_soc_init(void)
 {
 	int ret = 0; //JJH //CS
-	pr_info("%s: Entry\n", __FUNCTION__); //JJH //CS
-	printk(KERN_DEBUG "abu: Entering soc-core.c->snd_soc_init..."); //CS
+	//pr_info("%s: Entry\n", __FUNCTION__); //JJH //CS
+	//printk(KERN_DEBUG "abu: Entering soc-core.c->snd_soc_init..."); //CS
 	
 #ifdef CONFIG_DEBUG_FS
-	printk(KERN_DEBUG "abu: debugfs_create_dir(asoc, NULL)"); //CS
+	//printk(KERN_DEBUG "abu: debugfs_create_dir(asoc, NULL)"); //CS
 	snd_soc_debugfs_root = debugfs_create_dir("asoc", NULL);
 	if (IS_ERR(snd_soc_debugfs_root) || !snd_soc_debugfs_root) {
 		printk(KERN_WARNING
@@ -3410,9 +3410,9 @@ static int __init snd_soc_init(void)
 				 &platform_list_fops))
 		pr_warn("ASoC: Failed to create platform list debugfs file\n");
 #endif
-	pr_info("%s: ->snd_soc_util_init()\n", __FUNCTION__); //JJH //CS
+	//pr_info("%s: ->snd_soc_util_init()\n", __FUNCTION__); //JJH //CS
 	ret = snd_soc_util_init();
-	pr_info("%s: <-snd_soc_util_init(): ret: %d\n", __FUNCTION__,ret); //JJH //CS
+	//pr_info("%s: <-snd_soc_util_init(): ret: %d\n", __FUNCTION__,ret); //JJH //CS
 
 	return platform_driver_register(&soc_driver);
 }
