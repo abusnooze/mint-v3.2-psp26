@@ -21,6 +21,11 @@
 #include <sound/tlv.h>
 #include "that5173.h"
 
+static int debug;
+
+module_param(debug, int, S_IRUGO | S_IWUSR);
+MODULE_PARM_DESC(debug, "debugging level (higher values == more verbose)");
+
 /* codec private data */
 struct that5173_priv {
 	struct spi_device *spi;
@@ -44,12 +49,14 @@ static unsigned int that5173_reg_read(struct snd_soc_codec *codec,
 
 	u16 *cache = codec->reg_cache;
 	u16 value;
-
-	printk(KERN_DEBUG "that5173.c->that5173_reg_read: trying to read"); //CS
+	
+	if ( debug > 5 )
+		printk(KERN_DEBUG "that5173.c->that5173_reg_read: trying to read"); //CS
 
 	value = cache[reg];
 
-	printk(KERN_DEBUG "that5173.c->that5173_reg_read: cached value = %d",value); //CS
+	if ( debug > 5 )
+		printk(KERN_DEBUG "that5173.c->that5173_reg_read: cached value = %d",value); //CS
 
 	/* this doesn't work: I need to write and read simultaneously. If I use
 	   spi_write_then_read(...) I write 64 bit (cached value) and then I read 64 beats
@@ -100,7 +107,8 @@ static int that5173_reg_write(struct snd_soc_codec *codec, unsigned int reg,
 	u8 buffer[8];
 	int rc;
 
-	printk(KERN_DEBUG "that5173.c->that5173_reg_write: trying to write"); //CS
+	if ( debug > 5 )
+		printk(KERN_DEBUG "that5173.c->that5173_reg_write: trying to write"); //CS
 
 
 	/*do SPI transfer*/
@@ -114,10 +122,13 @@ static int that5173_reg_write(struct snd_soc_codec *codec, unsigned int reg,
 	buffer[7] = 0x30;
 	rc = spi_write(that5173->spi, buffer, 8);
 	if (rc) {
-		printk(KERN_DEBUG "that5173.c->that5173_reg_write: SPI reg write error!"); //CS
+		if ( debug > 1 )
+			printk(KERN_DEBUG "that5173.c->that5173_reg_write: SPI reg write error!"); //CS
+
 		return -EIO;
 	}
-	printk(KERN_DEBUG "that5173.c->that5173_reg_write: success"); //CS
+	if ( debug > 5 )
+		printk(KERN_DEBUG "that5173.c->that5173_reg_write: success"); //CS
 
 	/*update chache*/
 	cache[reg] = value;
@@ -137,7 +148,8 @@ static int that5173_probe(struct snd_soc_codec *codec)
 	//struct that5173_priv *that5173 = snd_soc_codec_get_drvdata(codec);
 	//struct snd_soc_dapm_context *dapm = &codec->dapm;
 
-	printk(KERN_DEBUG "Entering that5173_probe"); //CS
+	if ( debug > 5 )	
+		printk(KERN_DEBUG "Entering that5173_probe"); //CS
 
 	snd_soc_add_controls(codec, that5173_snd_controls, ARRAY_SIZE(that5173_snd_controls));
 
@@ -160,7 +172,8 @@ static int __devinit that5173_spi_probe(struct spi_device *spi)
 	struct that5173_priv *that5173;
 	int ret;
 
-	printk(KERN_DEBUG "Entering: that5173_spi_probe"); //CS
+	if ( debug > 5 )
+		printk(KERN_DEBUG "Entering: that5173_spi_probe"); //CS
 
 	//CS: compare: tlv320aic26.c
 
@@ -176,10 +189,12 @@ static int __devinit that5173_spi_probe(struct spi_device *spi)
 	ret = snd_soc_register_codec(&spi->dev, &soc_codec_dev_that5173, NULL, 0);
 	if (ret < 0){
 		kfree(that5173);
-		printk(KERN_DEBUG "that5173.c->that5173_spi_probe: snd_soc_register_codec failed!\n");
+		if ( debug > 1 )
+			printk(KERN_DEBUG "that5173.c->that5173_spi_probe: snd_soc_register_codec failed!\n");
 	} else {
 		ret = 0;
-		printk(KERN_DEBUG "that5173.c->that5173_spi_probe: SPI device initialized\n");
+		if ( debug > 1 )
+			printk(KERN_DEBUG "that5173.c->that5173_spi_probe: SPI device initialized\n");
 	}
 	
 	return ret;
@@ -190,7 +205,8 @@ static int __devexit that5173_spi_remove(struct spi_device *spi)
 {
 	struct that5173_priv *that5173 = spi_get_drvdata(spi);
 
-	printk(KERN_DEBUG "Entering: that5173_spi_remove"); //CS
+	if ( debug > 5 )	
+		printk(KERN_DEBUG "Entering: that5173_spi_remove"); //CS
 
 	snd_soc_unregister_codec(&spi->dev);
 
@@ -212,13 +228,16 @@ static int __init that5173_modinit(void)
 {
 	int ret;
 
-	printk(KERN_DEBUG "init that5173_modinit : SPI driver..."); //CS
+	if ( debug > 5 )
+		printk(KERN_DEBUG "init that5173_modinit : SPI driver..."); //CS
+
 	ret = spi_register_driver(&that5173_spi_driver);
 	if (ret != 0) {
-		printk(KERN_ERR "Failed to register that5173 SPI driver: %d\n",
-				ret);
+		if ( debug > 1 )
+			printk(KERN_ERR "Failed to register that5173 SPI driver: %d\n", ret);
 	} else {
-		printk(KERN_DEBUG "that5173 SPI driver registered!");
+		if ( debug > 5 )
+			printk(KERN_DEBUG "that5173 SPI driver registered!");
 	}
 		
 	return ret;
@@ -227,7 +246,9 @@ module_init(that5173_modinit);
 
 static void __exit that5173_modexit(void)
 {
-	printk(KERN_DEBUG "that5173_modexit: spi_unregister_driver"); //CS
+	if ( debug > 5 )
+ 		printk(KERN_DEBUG "that5173_modexit: spi_unregister_driver"); //CS
+
 	spi_unregister_driver(&that5173_spi_driver);
 
 }
